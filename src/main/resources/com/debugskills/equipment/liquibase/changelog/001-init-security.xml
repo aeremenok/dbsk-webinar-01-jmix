@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ========================================================= -->
+    <!-- Security schema: User + UserRole tables                    -->
+    <!-- ========================================================= -->
+
+    <changeSet id="001-010-create-equip-user" author="equipment-starter">
+        <createTable tableName="EQUIP_USER">
+            <column name="ID" type="${uuid.type}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="int" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATE_TS" type="TIMESTAMP"/>
+            <column name="CREATED_BY" type="VARCHAR(50)"/>
+            <column name="UPDATE_TS" type="TIMESTAMP"/>
+            <column name="UPDATED_BY" type="VARCHAR(50)"/>
+            <column name="DELETE_TS" type="TIMESTAMP"/>
+            <column name="DELETED_BY" type="VARCHAR(50)"/>
+            <column name="USERNAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FIRST_NAME" type="VARCHAR(255)"/>
+            <column name="LAST_NAME" type="VARCHAR(255)"/>
+            <column name="PASSWORD" type="VARCHAR(255)"/>
+            <column name="EMAIL" type="VARCHAR(255)"/>
+            <column name="ACTIVE" type="BOOLEAN"/>
+            <column name="TIME_ZONE_ID" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex tableName="EQUIP_USER" indexName="IDX_EQUIP_USER_ON_USERNAME" unique="true">
+            <column name="USERNAME"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="001-020-create-equip-user-role" author="equipment-starter">
+        <createTable tableName="EQUIP_USER_ROLE">
+            <column name="ID" type="${uuid.type}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="int" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="${uuid.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ROLE_CODE" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="EQUIP_USER_ROLE" indexName="IDX_EQUIP_USER_ROLE_USER">
+            <column name="USER_ID"/>
+        </createIndex>
+        <addUniqueConstraint tableName="EQUIP_USER_ROLE" columnNames="USER_ID, ROLE_CODE"
+                             constraintName="UQ_EQUIP_USER_ROLE"/>
+        <addForeignKeyConstraint baseTableName="EQUIP_USER_ROLE" baseColumnNames="USER_ID"
+                                 referencedTableName="EQUIP_USER" referencedColumnNames="ID"
+                                 constraintName="FK_EQUIP_USER_ROLE_ON_USER"/>
+    </changeSet>
+
+    <!-- ========================================================= -->
+    <!-- Default admin account (admin / admin)                      -->
+    <!-- ========================================================= -->
+
+    <changeSet id="001-030-admin-user" author="equipment-starter">
+        <insert tableName="EQUIP_USER">
+            <column name="ID" value="60885987-1b61-4247-94c7-dff348347f93"/>
+            <column name="VERSION" valueNumeric="1"/>
+            <column name="USERNAME" value="admin"/>
+            <!-- {noop} = Spring Security plaintext encoder; password is literally "admin" -->
+            <column name="PASSWORD" value="{noop}admin"/>
+            <column name="FIRST_NAME" value="System"/>
+            <column name="LAST_NAME" value="Administrator"/>
+            <column name="ACTIVE" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="001-040-admin-full-access-role" author="equipment-starter">
+        <insert tableName="EQUIP_USER_ROLE">
+            <column name="ID" value="10000000-0000-0000-0000-000000000001"/>
+            <column name="VERSION" valueNumeric="1"/>
+            <column name="USER_ID" value="60885987-1b61-4247-94c7-dff348347f93"/>
+            <column name="ROLE_CODE" value="system-full-access"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="001-050-admin-ui-minimal-role" author="equipment-starter">
+        <insert tableName="EQUIP_USER_ROLE">
+            <column name="ID" value="10000000-0000-0000-0000-000000000002"/>
+            <column name="VERSION" valueNumeric="1"/>
+            <column name="USER_ID" value="60885987-1b61-4247-94c7-dff348347f93"/>
+            <column name="ROLE_CODE" value="ui-minimal"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

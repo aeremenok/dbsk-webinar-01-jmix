@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- DO NOT REMOVE. Master changelog that runs all other changelogs. -->
+
+    <!-- Jmix framework system tables (data, flowui, security) -->
+    <include file="/io/jmix/data/liquibase/changelog.xml"/>
+    <include file="/io/jmix/flowuidata/liquibase/changelog.xml"/>
+    <include file="/io/jmix/securitydata/liquibase/changelog.xml"/>
+
+    <!-- Application: security schema + default admin account -->
+    <include file="/com/debugskills/equipment/liquibase/changelog/001-init-security.xml"/>
+
+    <!--
+        Students add their own changelogs below (entities from assignment Б1),
+        e.g. <include file="/com/debugskills/equipment/liquibase/changelog/002-entities.xml"/>
+    -->
+
+</databaseChangeLog>

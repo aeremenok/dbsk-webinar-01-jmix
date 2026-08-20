@@ -1,0 +1,65 @@
+plugins {
+    // 2.6.2 matches the already-cached Jmix/Vaadin deps on this machine (sportbot),
+    // so no fresh downloads are needed. The cheat-sheet APIs are identical across 2.6–2.8.
+    id 'io.jmix' version '2.6.2'
+    id 'java'
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.vaadin'
+
+jmix {
+    bomVersion = '2.6.2'
+    projectId = 'equipment-requests'
+}
+
+group = 'com.debugskills'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri('https://nexus.jmix.io/repository/public')
+    }
+}
+
+dependencies {
+    implementation 'io.jmix.core:jmix-core-starter'
+    implementation 'io.jmix.data:jmix-eclipselink-starter'
+    implementation 'io.jmix.security:jmix-security-starter'
+    implementation 'io.jmix.security:jmix-security-flowui-starter'
+    implementation 'io.jmix.security:jmix-security-data-starter'
+    implementation 'io.jmix.flowui:jmix-flowui-starter'
+    implementation 'io.jmix.flowui:jmix-flowui-data-starter'
+    implementation 'io.jmix.flowui:jmix-flowui-themes'
+    implementation 'io.jmix.localfs:jmix-localfs-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // HSQLDB is Jmix's natively-supported in-memory dev database.
+    // (Jmix 2.6–2.8 do NOT auto-detect H2 — see docs/jmix note and lesson1-log.)
+    runtimeOnly 'org.hsqldb:hsqldb'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.jmix.flowui:jmix-flowui-test-assist'
+}
+
+configurations.all {
+    // Hilla (React/TS) is not used; exclude to keep the frontend build lean.
+    exclude group: 'com.vaadin', module: 'hilla'
+    exclude group: 'com.vaadin', module: 'hilla-dev'
+    exclude group: 'com.vaadin', module: 'copilot'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+vaadin {
+    optimizeBundle = false
+}

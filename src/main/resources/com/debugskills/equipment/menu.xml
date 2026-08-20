@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<menu-config xmlns="http://jmix.io/schema/flowui/menu">
+
+    <!--
+        Empty application menu.
+        Students add the three list-view menu items here in assignment Б2
+        («Сотрудники», «Оборудование», «Заявки»).
+    -->
+
+</menu-config>

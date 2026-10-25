@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ========================================================= -->
+    <!-- Reference data tables: Employee, Equipment                 -->
+    <!-- ========================================================= -->
+
+    <changeSet id="002-010-create-equip-employee" author="equipment-starter">
+        <createTable tableName="EQUIP_EMPLOYEE">
+            <column name="ID" type="${uuid.type}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="int" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATE_TS" type="TIMESTAMP"/>
+            <column name="CREATED_BY" type="VARCHAR(50)"/>
+            <column name="UPDATE_TS" type="TIMESTAMP"/>
+            <column name="UPDATED_BY" type="VARCHAR(50)"/>
+            <column name="DELETE_TS" type="TIMESTAMP"/>
+            <column name="DELETED_BY" type="VARCHAR(50)"/>
+            <column name="FULL_NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMAIL" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DEPARTMENT" type="VARCHAR(255)"/>
+            <column name="ACTIVE" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="EQUIP_EMPLOYEE" indexName="IDX_EQUIP_EMPLOYEE_ON_EMAIL" unique="true">
+            <column name="EMAIL"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-020-create-equip-equipment" author="equipment-starter">
+        <createTable tableName="EQUIP_EQUIPMENT">
+            <column name="ID" type="${uuid.type}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="int" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATE_TS" type="TIMESTAMP"/>
+            <column name="CREATED_BY" type="VARCHAR(50)"/>
+            <column name="UPDATE_TS" type="TIMESTAMP"/>
+            <column name="UPDATED_BY" type="VARCHAR(50)"/>
+            <column name="DELETE_TS" type="TIMESTAMP"/>
+            <column name="DELETED_BY" type="VARCHAR(50)"/>
+            <column name="INVENTORY_NUMBER" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TYPE" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATUS" type="VARCHAR(50)" defaultValue="AVAILABLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="EQUIP_EQUIPMENT" indexName="IDX_EQUIP_EQUIPMENT_ON_INV_NUM" unique="true">
+            <column name="INVENTORY_NUMBER"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

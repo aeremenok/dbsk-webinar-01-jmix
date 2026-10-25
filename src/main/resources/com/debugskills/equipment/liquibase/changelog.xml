@@ -15,9 +15,10 @@
     <!-- Application: security schema + default admin account -->
     <include file="/com/debugskills/equipment/liquibase/changelog/001-init-security.xml"/>
 
-    <!--
-        Students add their own changelogs below (entities from assignment Б1),
-        e.g. <include file="/com/debugskills/equipment/liquibase/changelog/002-entities.xml"/>
-    -->
+    <!-- Reference data: Employee + Equipment tables and the seed from the business brief -->
+    <include file="/com/debugskills/equipment/liquibase/changelog/002-reference.xml"/>
+    <include file="/com/debugskills/equipment/liquibase/changelog/003-seed.xml"/>
+
+    <!-- New changelogs (004-*.xml, ...) are added below; existing changeSets are never edited. -->
 
 </databaseChangeLog>

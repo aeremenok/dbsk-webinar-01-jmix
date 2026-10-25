@@ -59,7 +59,50 @@ Spring-контекст поднимается.
 Gradle и Jmix отдельно ставить не нужно: в проекте есть Gradle wrapper, зависимости
 подтянутся сами.
 
-## Контекстного слоя здесь нет
+## Контекстный слой
 
-Это базовая версия стартера. Файлов, которые подсказывают AI-ассистенту специфику Jmix,
-в ней нет — и агент на этом проекте будет уверенно ошибаться. С этого эфир и начнётся.
+В ветке `main` (стартер вебинара) контекстного слоя нет — с этого начинался вебинар.
+В ветке `lab-sdd/start` он есть: `AGENTS.md` и `docs/jmix/` (включая полную документацию Jmix).
+
+## Лаба SDD (ветка lab-sdd/start)
+
+Ветка `lab-sdd/start` — стенд лабораторной «SDD: спецификация, которую исполняет агент»
+(Spec Kit + opencode): стартер, контекстный слой для агента, REST-каркас, справочники сотрудников и
+склада, Spec Kit с конституцией, бизнес-бриф и скрипты проверки. Папки `specs/` в ней нет: её создаст
+агент в ходе лабы. Остальные ветки `lab-sdd/*` (чекпоинты, демо, поломки) нужны только на самой лабе.
+
+Бриф для работы лежит в `docs/brief/`: [business-brief.md](docs/brief/business-brief.md) и
+[portal-requirement.md](docs/brief/portal-requirement.md).
+
+### Что должно стоять
+
+- JDK 21 и `JAVA_HOME` на него (см. «Запуск» выше);
+- Node.js 22 LTS (нужен opencode и сборке фронтенда Vaadin);
+- `opencode-ai@1.19.4`: `npm i -g opencode-ai@1.19.4`;
+- git, curl, jq;
+- Windows — только через WSL, репозиторий клонировать в файловую систему WSL (`~/…`), не в `/mnt/c`;
+- ключ DeepSeek, который выдаёт ведущий лично (не в общий чат), в переменной окружения
+  `DEEPSEEK_API_KEY`: `opencode.json` читает его оттуда, в репозиторий ключ не попадает.
+
+### Домашняя подготовка (до 28.10, 18:00)
+
+```bash
+git clone -b lab-sdd/start https://github.com/aeremenok/dbsk-webinar-01-jmix.git
+cd dbsk-webinar-01-jmix
+./gradlew build                 # прогрев: первый раз Vaadin долго собирает фронтенд
+scripts/doctor.sh               # версии, ключ, ответ обеих моделей, компиляция
+./gradlew bootRun               # в отдельном терминале
+curl -s localhost:8080/api/ping # → {"status":"ok","employees":5}
+```
+
+Вывод `scripts/doctor.sh` и ответ `/api/ping` пришлите в чат подготовки. Кто не прислал, на лабе
+работает в паре или смотрит демо.
+
+### Скрипты
+
+| Скрипт | Что делает |
+|---|---|
+| `scripts/doctor.sh` | Проверка рабочего места: версии Java (21), Node (22), opencode, git, curl, jq; ключ (виден только как `***`); короткий запрос к моделям Pro и Flash с замером времени; `./gradlew -q compileJava`. Флаг `--no-llm` пропускает запросы к моделям. Итог: GREEN или RED |
+| `scripts/check.sh` | Технические проверки результата агента: `./gradlew test`; охрана конституции (security, `ApiSecurityConfiguration`, `build.gradle` не изменены, `jmix-rest` не подключён); в `spec.md` не осталось `[NEEDS CLARIFICATION]`; сколько задач в `tasks.md` не закрыто; число тестов не уменьшилось. Строки PASS / FAIL / SKIP, код возврата не ноль при FAIL |
+| `scripts/accept.sh` | Бизнес-приёмка A1–A9 через curl и jq против запущенного приложения (`BASE_URL`, по умолчанию `http://localhost:8080`). Запускать на свежем `bootRun`. Последняя строка — «N/9». Те же запросы для IDE: `http/acceptance.http` |
+| `scripts/catchup.sh N` | Догнать группу: `N` — `1`, `1r`, `2` или `3`. Создаёт ветку `001-equipment-request-cpN` из `origin/lab-sdd/checkpoint-N`; несохранённые изменения прячет в `git stash` |

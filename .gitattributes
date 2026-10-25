@@ -1,0 +1,7 @@
+# Скрипты стенда и gradlew всегда с LF, даже при клонировании на Windows:
+# с CRLF bash в WSL/Git Bash падает на "\r".
+*.sh      text eol=lf
+gradlew   text eol=lf
+
+# Полная документация Jmix (85 тыс. строк): не раздуваем diff и git-вывод.
+*.adoc    -diff eol=lf

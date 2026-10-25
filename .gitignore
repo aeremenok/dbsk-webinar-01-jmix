@@ -21,3 +21,7 @@ types.d.ts
 # Logs / OS
 *.log
 .DS_Store
+
+# Vaadin dev-mode artifacts created by bootRun
+vite.config.ts
+.vaadin-node-tasks.lock

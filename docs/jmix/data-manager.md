@@ -147,6 +147,31 @@ dataManager.remove(Id.of(id, Employee.class));   // если есть тольк
 
 По умолчанию `DataManager` присоединяется к текущей транзакции или открывает новую на одну операцию. Несколько шагов, которые должны пройти атомарно (прочитать, изменить, сохранить несколько сущностей), оборачивай в `@org.springframework.transaction.annotation.Transactional` на методе сервиса (раздел Transaction Management, строка 19528). Работает только при вызове через инжектированный бин.
 
+## Блокировки и HSQLDB
+
+Пессимистическая блокировка — `.lockMode(LockModeType.PESSIMISTIC_WRITE)` в загрузке (раздел Using Locks).
+Нужна, только если спецификация требует защиты от одновременных изменений; без такого требования не добавляй.
+
+**Особенность HSQLDB (проверено на стенде):** `SELECT … FOR UPDATE` вместе с `ORDER BY` или
+`maxResults` / `FETCH FIRST` / `LIMIT` **не блокирует строки**, параллельные транзакции проходят мимо
+блокировки. Поэтому сначала найди кандидата обычным запросом, потом заблокируй его **по id** и
+перепроверь состояние:
+
+```java
+Optional<Equipment> candidate = dataManager.load(Equipment.class)
+        .query("select e from equipment_Equipment e where e.type = :type and e.status = :st order by e.inventoryNumber")
+        .parameter("type", type)
+        .parameter("st", EquipmentStatus.AVAILABLE)
+        .maxResults(1)
+        .optional();
+Equipment unit = candidate.map(c -> dataManager.load(Equipment.class)
+                .id(c.getId())
+                .lockMode(LockModeType.PESSIMISTIC_WRITE)   // блокировка по id работает
+                .one())
+        .filter(u -> u.getStatus() == EquipmentStatus.AVAILABLE)  // перепроверка после блокировки
+        .orElse(null);
+```
+
 ## Чего НЕТ (галлюцинации)
 
 - `findAll()`, `findById()`, `findByExample()`, `getRepository()` — это Spring Data, не Jmix.

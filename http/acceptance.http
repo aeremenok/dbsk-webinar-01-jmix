@@ -1,0 +1,153 @@
+# Бизнес-приёмка A1–A9 для IDE: IntelliJ IDEA / JetBrains HTTP Client и VS Code (расширение REST Client).
+# То же самое делает scripts/accept.sh из консоли.
+#
+# Запускать на СВЕЖЕМ `./gradlew bootRun`, запросы строго по порядку: каждый следующий опирается
+# на состояние после предыдущих. Проверяйте класс ответа (2xx / 4xx) и поля тела, а не конкретные коды.
+
+@baseUrl = http://localhost:8080
+
+### Проверка стенда: должно вернуться {"status":"ok","employees":5}
+GET {{baseUrl}}/api/ping
+
+### A1. Иван подаёт заявку на ноутбук
+# Ожидается: 2xx, status = RESERVED, inventoryNumber начинается с LAP-. Запомните id.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "ivan.petrov@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для работы"
+}
+
+### A2. Иван подаёт ту же заявку повторно
+# Ожидается: 2xx, тот же id, что в A1 (новой заявки нет).
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "ivan.petrov@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для работы"
+}
+
+### A3 (1/2). Мария подаёт заявку на ноутбук
+# Ожидается: 2xx, status = RESERVED (последний свободный ноутбук).
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "maria.sidorova@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для проекта"
+}
+
+### A3 (2/2). Алексей подаёт заявку на ноутбук
+# Ожидается: 2xx, status = QUEUED, queuePosition = 1. Запомните id.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "aleksey.ivanov@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для разработки"
+}
+
+### A4. Ольга подаёт заявку на ноутбук
+# Ожидается: 2xx, status = QUEUED, queuePosition = 2.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "olga.smirnova@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для аналитики"
+}
+
+### A5. Ольга подаёт заявку на монитор
+# Ожидается: 2xx, status = QUEUED, queuePosition = 1.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "olga.smirnova@company.com",
+  "equipmentType": "MONITOR",
+  "reason": "Нужен второй монитор"
+}
+
+### A6 (1/2). Заявку подаёт уволенный Пётр
+# Ожидается: 4xx с понятным объяснением.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "petr.kuznetsov@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для работы"
+}
+
+### A6 (2/2). Заявку подаёт неизвестный email
+# Ожидается: 4xx с понятным объяснением.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "nobody@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для работы"
+}
+
+### A7 (1/2). Пустая причина
+# Ожидается: 4xx с понятным объяснением.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "ivan.petrov@company.com",
+  "equipmentType": "HEADSET",
+  "reason": ""
+}
+
+### A7 (2/2). Тип «принтер»
+# Ожидается: 4xx с понятным объяснением.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "ivan.petrov@company.com",
+  "equipmentType": "PRINTER",
+  "reason": "Нужен принтер для печати"
+}
+
+### A7b (необязательная, только ветка поломки 3). Причина короче 10 символов
+# Ожидается: 4xx. На обычной ветке этой проверки нет, в зачёт 9/9 она не входит.
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "maria.sidorova@company.com",
+  "equipmentType": "HEADSET",
+  "reason": "нужно"
+}
+
+### A8. Иван подаёт заявку на ноутбук: email в другом регистре и с пробелами по краям
+# Ожидается: 2xx, id из A1 (новой заявки нет).
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": " IVAN.Petrov@Company.com ",
+  "equipmentType": "LAPTOP",
+  "reason": "Нужен ноутбук для работы"
+}
+
+### A9. Алексей повторно подаёт заявку на ноутбук с другой причиной
+# Ожидается: 2xx, id из A3, queuePosition = 1 (позиция не изменилась).
+POST {{baseUrl}}/api/equipment-requests
+Content-Type: application/json
+
+{
+  "employeeEmail": "aleksey.ivanov@company.com",
+  "equipmentType": "LAPTOP",
+  "reason": "Совсем другая причина заявки"
+}

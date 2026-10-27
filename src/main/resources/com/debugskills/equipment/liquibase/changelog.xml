@@ -20,5 +20,6 @@
     <include file="/com/debugskills/equipment/liquibase/changelog/003-seed.xml"/>
 
     <!-- New changelogs (004-*.xml, ...) are added below; existing changeSets are never edited. -->
+    <include file="/com/debugskills/equipment/liquibase/changelog/004-equipment-request.xml"/>
 
 </databaseChangeLog>

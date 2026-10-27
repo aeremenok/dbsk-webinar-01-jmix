@@ -33,7 +33,7 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 **Purpose**: Проверка исходного состояния — фундамент неизменяемого кода.
 
-- [ ] T001 Verify baseline is green: run `./gradlew compileJava` and `./gradlew test` from repo root
+- [X] T001 Verify baseline is green: run `./gradlew compileJava` and `./gradlew test` from repo root
     before any changes; both must pass. (Do NOT run `bootRun`.)
 
 **Checkpoint**: старт — компиляция и тесты зелёные.
@@ -49,7 +49,7 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 ### Schema & entity
 
-- [ ] T002 [P] Create Liquibase changelog
+- [X] T002 [P] Create Liquibase changelog
     `src/main/resources/com/debugskills/equipment/liquibase/changelog/004-equipment-request.xml`
     (changeSet `004-010-create-equip-equipment-request`, author `equipment-starter`) per `data-model.md`:
     table `EQUIP_EQUIPMENT_REQUEST` with all `StandardJmixEntity` columns (`ID` `${uuid.type}` PK
@@ -61,15 +61,15 @@ Given/When/Then из `spec.md` — автоматический тест.
     `IDX_EQUIP_EQUIPMENT_REQUEST_ON_EMP_TYPE` (EMPLOYEE_ID, TYPE); FKs
     `FK_EQUIP_EQUIPMENT_REQUEST_ON_EMPLOYEE` → EQUIP_EMPLOYEE(ID),
     `FK_EQUIP_EQUIPMENT_REQUEST_ON_EQUIPMENT` → EQUIP_EQUIPMENT(ID).
-- [ ] T003 Add `<include file="/com/debugskills/equipment/liquibase/changelog/004-equipment-request.xml"/>`
+- [X] T003 Add `<include file="/com/debugskills/equipment/liquibase/changelog/004-equipment-request.xml"/>`
     to the END of `src/main/resources/com/debugskills/equipment/liquibase/changelog.xml`
     (only add the include — do not touch existing includes/changeSets).
-- [ ] T004 [P] Create enum `EquipmentRequestStatus` in
+- [X] T004 [P] Create enum `EquipmentRequestStatus` in
     `src/main/java/com/debugskills/equipment/entity/EquipmentRequestStatus.java` per `research.md` R3
     and `data-model.md`: `EnumClass<String>`, constants `RESERVED("RESERVED")`, `QUEUED("QUEUED")`,
     `getId()`, static `fromId(String)` returning `null` for unknown values; copy pattern from
     `EquipmentStatus.java`.
-- [ ] T005 Create entity `EquipmentRequest` in
+- [X] T005 Create entity `EquipmentRequest` in
     `src/main/java/com/debugskills/equipment/entity/EquipmentRequest.java` per `data-model.md` and
     `research.md` R3: `@JmixEntity`, `@Entity(name = "equipment_EquipmentRequest")`,
     `@Table(name = "EQUIP_EQUIPMENT_REQUEST", indexes = { @Index(UNIQUE) on EMPLOYEE_ID,TYPE })`,
@@ -82,7 +82,7 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 ### API scaffolding
 
-- [ ] T006 [P] Create DTO records in `src/main/java/com/debugskills/equipment/api/` per
+- [X] T006 [P] Create DTO records in `src/main/java/com/debugskills/equipment/api/` per
     `contracts/equipment-requests-api.md`:
     `CreateEquipmentRequest(String employeeEmail, String equipmentType, String reason)` — each field
     `@NotBlank` (jakarta.validation.constraints);
@@ -90,7 +90,7 @@ Given/When/Then из `spec.md` — автоматический тест.
     annotated `@JsonInclude(JsonInclude.Include.NON_NULL)` with static `from(EquipmentRequest r)`;
     `ApiError(String error, String message)`. NOTE: `ApiError` несёт одно строковое `message` по
     FR-010/`contracts/` — НЕ `List<String> details` из примера `docs/jmix/rest.md`.
-- [ ] T007 Create business exception `EquipmentRequestException` (RuntimeException holding `code`
+- [X] T007 Create business exception `EquipmentRequestException` (RuntimeException holding `code`
     + `message`) in `src/main/java/com/debugskills/equipment/app/EquipmentRequestException.java`;
     then create `@RestControllerAdvice` `ApiExceptionHandler` in
     `src/main/java/com/debugskills/equipment/api/ApiExceptionHandler.java` per `research.md` R1 and
@@ -98,13 +98,13 @@ Given/When/Then из `spec.md` — автоматический тест.
     `ApiError("validation_failed", …)`, `HttpMessageNotReadableException` → 400
     `ApiError("malformed_request", …)`, and `EquipmentRequestException` → 400
     `ApiError(code, message)`.
-- [ ] T008 Create `@RestController` `EquipmentRequestController` in
+- [X] T008 Create `@RestController` `EquipmentRequestController` in
     `src/main/java/com/debugskills/equipment/api/EquipmentRequestController.java`: `@PostMapping`
     on `@RequestMapping("/api/equipment-requests")`, signature
     `ResponseEntity<EquipmentRequestResponse> create(@Valid @RequestBody CreateEquipmentRequest body)`
     delegating to `EquipmentRequestService.submit(...)`; return `ResponseEntity.ok(...)`.
     (depends on T009 — create together with the service skeleton so the class compiles)
-- [ ] T009 Create `@Service` `EquipmentRequestService` in
+- [X] T009 Create `@Service` `EquipmentRequestService` in
     `src/main/java/com/debugskills/equipment/app/EquipmentRequestService.java` with
     constructor-injected `UnconstrainedDataManager` and placeholder
     `@Transactional public EquipmentRequestResponse submit(CreateEquipmentRequest body)` returning
@@ -126,14 +126,14 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 ### Tests for User Story 1
 
-- [ ] T010 [US1] Add test-data isolation infra per `research.md` R8 in
+- [X] T010 [US1] Add test-data isolation infra per `research.md` R8 in
     `src/test/java/com/debugskills/equipment/api/EquipmentRequestControllerTest.java`:
     `@Autowired UnconstrainedDataManager dataManager` + `SystemAuthenticator`; static
     `SEED_STATUS` map (`"LAP-001"→AVAILABLE, "LAP-002"→AVAILABLE, "LAP-003"→ISSUED,
     "MON-001"→ISSUED, "MON-002"→ISSUED, "HDS-001"→AVAILABLE`); `@AfterEach` inside
     `systemAuthenticator.runWithSystem(...)` deletes ALL `EquipmentRequest` rows then restores seed
     `Equipment` statuses; NEVER create/delete seed `Employee` rows.
-- [ ] T011 [P] [US1] Write MockMvc test
+- [X] T011 [P] [US1] Write MockMvc test
     `given_ivan_laptop_when_post_then_reserved` for scenario A1 in
     `src/test/java/com/debugskills/equipment/api/EquipmentRequestControllerTest.java`: expect 200,
     `$.status == "RESERVED"`, `$.inventoryNumber` prefix `LAP-`, `$.id` present, `$.queuePosition`
@@ -141,15 +141,15 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implement employee lookup as the first step of `EquipmentRequestService.submit(...)`
+- [X] T012 [US1] Implement employee lookup as the first step of `EquipmentRequestService.submit(...)`
     (`src/main/java/com/debugskills/equipment/app/EquipmentRequestService.java`): JPQL
     `lower(e.email) = :email` with parameter `body.employeeEmail().trim().toLowerCase()` (FR-002);
     if not found, throw the `equipment_request` business exception with code `employee_not_found`
     (message per `contracts/equipment-requests-api.md`).
-- [ ] T013 [US1] Implement equipment-type validation in `submit(...)`: `EquipmentType.fromId(body
+- [X] T013 [US1] Implement equipment-type validation in `submit(...)`: `EquipmentType.fromId(body
     .equipmentType())`; if `null` (or raw string not decoded), throw business exception with code
     `invalid_equipment_type` (FR-003, 400 per FR-010).
-- [ ] T014 [US1] Implement reservation branch in `submit(...)`: load available unit with
+- [X] T014 [US1] Implement reservation branch in `submit(...)`: load available unit with
     `.query("select e from equipment_Equipment e where e.type = :type and e.status = :st order by
     e.inventoryNumber").parameter("type", type).parameter("st", EquipmentStatus.AVAILABLE)
     .lockMode(LockModeType.PESSIMISTIC_WRITE).maxResults(1).optional()` (research.md R5/R6); if
@@ -173,14 +173,14 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 ### Tests for User Story 2
 
-- [ ] T015 [P] [US2] Write MockMvc tests for scenarios A3 (Алексей, после резерва Марии),
+- [X] T015 [P] [US2] Write MockMvc tests for scenarios A3 (Алексей, после резерва Марии),
     A4 (Ольга), A5 (Ольга → монитор `QUEUED` `queuePosition=1`) in
     `src/test/java/com/debugskills/equipment/api/EquipmentRequestControllerTest.java` — expect 200,
     `$.status == "QUEUED"`, exact `$.queuePosition`. Must FAIL until T016.
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Implement queue branch in `submit(...)`: when no free unit — compute
+- [X] T016 [US2] Implement queue branch in `submit(...)`: when no free unit — compute
     `Long queued = dataManager.loadValue("select count(r) from equipment_EquipmentRequest r where
     r.type = :type and r.status = :st", Long.class).parameter("type", type).parameter("st",
     EquipmentRequestStatus.QUEUED).one();` then `queuePosition = queued.intValue() + 1`; create
@@ -203,14 +203,14 @@ Given/When/Then из `spec.md` — автоматический тест.
 
 ### Tests for User Story 3
 
-- [ ] T017 [P] [US3] Write MockMvc tests for A2, A8, A9 in
+- [X] T017 [P] [US3] Write MockMvc tests for A2, A8, A9 in
     `src/test/java/com/debugskills/equipment/api/EquipmentRequestControllerTest.java`: reuse the `id`
     captured from A1/A3 within the same test method (each test builds its own Given-state); A8 — body
     `"IVAN.Petrov@Company.com"` with leading/trailing spaces; A9 — assert `$.queuePosition` unchanged.
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Implement dedup in `submit(...)` BEFORE reservation: query
+- [X] T018 [US3] Implement dedup in `submit(...)` BEFORE reservation: query
     `.query("select r from equipment_EquipmentRequest r where r.employee = :emp and r.type = :type")
     .parameter("emp", employee).parameter("type", type).optional()`; if present — return
     `EquipmentRequestResponse.from(existing)` immediately (reason NOT stored/updated). The unique
@@ -233,16 +233,16 @@ FR-003, FR-004, FR-010).
 
 ### Tests for User Story 4
 
-- [ ] T019 [P] [US4] Write MockMvc tests for A6 and A7 in
+- [X] T019 [P] [US4] Write MockMvc tests for A6 and A7 in
     `src/test/java/com/debugskills/equipment/api/EquipmentRequestControllerTest.java`: expect 400 and
     exactly the `error` codes listed in the Goal; whitespace-only `reason` (`"   "`) also rejected.
 
 ### Implementation for User Story 4
 
-- [ ] T020 [US4] Add inactive-employee check in `submit(...)` after T012 lookup:
+- [X] T020 [US4] Add inactive-employee check in `submit(...)` after T012 lookup:
     if `employee.getActive() == false` throw business exception with code `employee_inactive`
     (FR-002); ensure `ApiExceptionHandler` maps both business exceptions to 400 `ApiError`.
-- [ ] T021 [US4] Confirm bean-validation path: blank/missing `employeeEmail`/`equipmentType`/`reason`
+- [X] T021 [US4] Confirm bean-validation path: blank/missing `employeeEmail`/`equipmentType`/`reason`
     (incl. whitespace-only `reason`) fail `@NotBlank` on `CreateEquipmentRequest` and produce 400
     `validation_failed` via `ApiExceptionHandler#onInvalid`; malformed JSON → 400
     `malformed_request` (FR-001, FR-004, contracts table).
@@ -255,7 +255,7 @@ FR-003, FR-004, FR-010).
 
 **Purpose**: Конкурентность (Q3=A), полный прогон и проверка охраны конституции.
 
-- [ ] T022 [P] Write concurrency/atomicity test in
+- [X] T022 [P] Write concurrency/atomicity test in
     `src/test/java/com/debugskills/equipment/app/EquipmentRequestServiceTest.java` (@SpringBootTest):
     Given — two OWN `Employee` rows (unique emails, distinct from seed) via `UnconstrainedDataManager`
     inside `systemAuthenticator.runWithSystem(...)`; ensure EXACTLY ONE `Equipment` of the requested
@@ -265,9 +265,9 @@ FR-003, FR-004, FR-010).
     for the two employees against that type. Then — assert exactly one `RESERVED` and one `QUEUED`
     with `queuePosition=1`, and that the single unit ended `BOOKED` (never double-reserved; spec Edge
     Case, SC-005). Clean up created rows in `@AfterEach`.
-- [ ] T023 Run `./gradlew test` from repo root; all tests (existing `PingControllerTest`,
+- [X] T023 Run `./gradlew test` from repo root; all tests (existing `PingControllerTest`,
     `EquipmentRequestsApplicationTests` and new feature tests) must be green.
-- [ ] T024 Run `./gradlew compileJava` and `scripts/check.sh` from repo root; expect PASS lines —
+- [X] T024 Run `./gradlew compileJava` and `scripts/check.sh` from repo root; expect PASS lines —
     guards `security/**`, `ApiSecurityConfiguration.java`, `build.gradle` untouched, no
     `[NEEDS CLARIFICATION]` left in `spec.md`, test count not decreased.
 
